@@ -14,6 +14,8 @@ enum PeriodType {
   WEEK = 'week',
   MONTH = 'month',
   TWOWEEKS = '2weeks',
+  ALL = 'all',
+  RECENT = 'recent',
 }
 
 const History: React.FC<HistoryScreenProps> = () => {
@@ -36,14 +38,10 @@ const History: React.FC<HistoryScreenProps> = () => {
     if (allEmos && allEmos.length > 0) {
       const oneWeekAgo = new Date()
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
       const twoWeekAgo = new Date()
       twoWeekAgo.setDate(oneWeekAgo.getDate() - 14)
 
-      console.log(
-        new Date(allEmos[0].created_at) > oneWeekAgo,
-        new Date(allEmos[0].created_at),
-        oneWeekAgo
-      )
       const filtered = allEmos.filter((doc) => {
         if (value === PeriodType.WEEK) {
           if (new Date(doc.created_at) >= oneWeekAgo) return doc
@@ -51,6 +49,8 @@ const History: React.FC<HistoryScreenProps> = () => {
           return new Date(doc.created_at) >= twoWeekAgo
         } else if (value === PeriodType.MONTH) {
           return new Date(doc.created_at) >= twoWeekAgo
+        } else if (value === PeriodType.ALL) {
+          return true
         }
       })
 
@@ -121,20 +121,25 @@ const History: React.FC<HistoryScreenProps> = () => {
       </View>
       {allEmos ? (
         <>
-          {allEmos.map((item, index) => {
-            return (
-              <CollectedEmotionView key={index}>
-                <Text>{item.emotion}</Text>
-                <Text>{item.sentence}</Text>
-                <Text>{item.created_at}</Text>
-              </CollectedEmotionView>
-            )
-          })}
+          {value === PeriodType.ALL ? (
+            <>
+              {allEmos.map((item, index) => {
+                return (
+                  <CollectedEmotionView key={index}>
+                    <Text>{item.emotion}</Text>
+                    <Text>{item.sentence}</Text>
+                    <Text>{item.created_at}</Text>
+                  </CollectedEmotionView>
+                )
+              })}
+            </>
+          ) : (
+            <View>{returnStatics()}</View>
+          )}
         </>
       ) : (
         <Text>loading..</Text>
       )}
-      <View>{returnStatics()}</View>
     </HistoryContainer>
   )
 }
