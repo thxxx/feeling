@@ -1,0 +1,23 @@
+// prettier-ignore
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",     /* Recommended React Native TSConfig base */
+  "compilerOptions": {
+    "jsx": "react",
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    "baseUrl": ".",
+    "paths": {
+      "@assets/*": ["./src/assets/*"],
+      "@components/*": ["./src/components/*"],
+      "@navigations/*": ["./src/navigations/*"],
+      "@screens/*": ["./src/screens/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@utils/*": ["./src/utils/*"],
+      "src": ["./src"],
+      "@src/*": ["./src/*"],
+    },
+
+    /* Completeness */
+    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "types": ["jest", "styled-components-react-native"]
+  },
+}
