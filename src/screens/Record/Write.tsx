@@ -25,7 +25,7 @@ const Write = ({ navigation, route }: WriteScreenProps) => {
         date:
           String(now.getFullYear()) +
           '/' +
-          String(now.getMonth()) +
+          String(now.getMonth() + 1) +
           '/' +
           String(now.getDate()),
         uid: uid,

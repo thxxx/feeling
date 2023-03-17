@@ -3,17 +3,24 @@ import RootNavigator from './navigations'
 import { useUserStore } from './store/userStore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import uuid from 'react-native-uuid'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+// import RNBootSplash from 'react-native-bootsplash'
 
 const App = () => {
   const { setUid } = useUserStore()
 
   useEffect(() => {
     init()
+    // .finally(async () => {
+    //   await RNBootSplash.hide({
+    //     fade: true,
+    //   })
+    // })
   }, [])
 
   const init = async () => {
     const value = await AsyncStorage.getItem('uid')
-    console.log('밸류를 얻음', value)
+
     if (value) {
       setUid(value)
     } else {
@@ -23,7 +30,11 @@ const App = () => {
       setUid(newUid)
     }
   }
-  return <RootNavigator />
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <RootNavigator />
+    </GestureHandlerRootView>
+  )
 }
 
 export default App

@@ -27,6 +27,8 @@ const History: React.FC<HistoryScreenProps> = () => {
     { label: '최근 일주일', value: PeriodType.WEEK },
     { value: PeriodType.TWOWEEKS, label: '최근 이주일' },
     { value: PeriodType.MONTH, label: '최근 한달' },
+    { value: PeriodType.ALL, label: '전체' },
+    { value: PeriodType.RECENT, label: '최신순' },
   ])
   const { uid } = useUserStore()
 
@@ -57,7 +59,17 @@ const History: React.FC<HistoryScreenProps> = () => {
       setAllEmos(filtered)
       makeStatics(filtered)
     }
+    if (value === PeriodType.RECENT) init()
   }, [value])
+
+  const init = async () => {
+    const { data, error } = await supabase
+      .from('emotions')
+      .select()
+      .eq('uid', uid)
+    setAllEmos(data as any)
+    makeStatics(data as any)
+  }
 
   const makeStatics = (filtered: EmotionType[]) => {
     if (filtered && filtered.length > 0) {
@@ -69,32 +81,25 @@ const History: React.FC<HistoryScreenProps> = () => {
         if (allKinds[item.emotion]) allKinds[item.emotion] += 1
         else allKinds[item.emotion] = 1
       })
-      console.log(allKinds[Emotion.BAD])
+      console.log(allKinds)
       setStats(allKinds)
     }
   }
 
-  const init = async () => {
-    const { data, error } = await supabase
-      .from('emotions')
-      .select()
-      .eq('uid', uid)
-    setAllEmos(data as any)
-    makeStatics(data as any)
-  }
-
   const returnStatics = () => {
+    let boxes = []
     for (const key in Emotion) {
-      if (stats[key] && stats[key] > 0) {
-        return (
+      if (stats && stats[Emotion[key]] && stats[Emotion[key]] > 0) {
+        boxes.push(
           <StaticBox>
             <Text>
-              {key} : {stats[key]}
+              {key} : {stats[Emotion[key]]}
             </Text>
           </StaticBox>
         )
       }
     }
+    return boxes
   }
 
   return (
@@ -121,14 +126,14 @@ const History: React.FC<HistoryScreenProps> = () => {
       </View>
       {allEmos ? (
         <>
-          {value === PeriodType.ALL ? (
+          {value === PeriodType.RECENT ? (
             <>
               {allEmos.map((item, index) => {
                 return (
                   <CollectedEmotionView key={index}>
                     <Text>{item.emotion}</Text>
                     <Text>{item.sentence}</Text>
-                    <Text>{item.created_at}</Text>
+                    <Text>{item.date}</Text>
                   </CollectedEmotionView>
                 )
               })}
@@ -165,5 +170,7 @@ const CustromDropdown = styled(DropDownPicker)`
 
 const StaticBox = styled.View`
   background-color: rgba(100, 0, 0, 0.2);
-  width: 200px;
+  margin: 4px;
+  border-radius: 6px;
+  padding: 12px;
 `

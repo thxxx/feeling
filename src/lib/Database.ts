@@ -18,4 +18,5 @@ export type EmotionType = {
   created_at: any
   uid: number | string
   sentence: string
+  date: string
 }
