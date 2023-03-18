@@ -23,9 +23,10 @@ type ContextType = {
   translateY: number
 }
 
-const BOX_HEIGHT = 150
-const BOX_WIDTH = 150
-const NUM_COLS = 7
+const BOX_HEIGHT = 180
+const BOX_WIDTH = 180
+const BOX_MARGIN = 6
+const NUM_COLS = 6
 
 const Record: React.FC<RecordScreenProps> = ({ navigation }) => {
   const [isButtonVisible, setIsButtonVisible] = useState(false)
@@ -40,9 +41,9 @@ const Record: React.FC<RecordScreenProps> = ({ navigation }) => {
     // setIsOpen(true)
   }
 
-  const ii = () => {
+  const ii = (cx: number, ex: number) => {
     setIsButtonVisible((prev) => !prev)
-    console.log(12)
+    // 박스 바운더리를 넘을 때 한번만 실행되게 할 수는 없을까?
   }
 
   const gestureHandler = useAnimatedGestureHandler<
@@ -56,7 +57,12 @@ const Record: React.FC<RecordScreenProps> = ({ navigation }) => {
     onActive: (event, context) => {
       valueX.value = event.translationX + context.translateX
       valueY.value = event.translationY + context.translateY
-      runOnJS(ii)()
+      if (
+        valueX.value % 100 > -10 &&
+        valueX.value % 100 < 10 &&
+        (event.translationX > 3 || event.translationX < -3)
+      )
+        runOnJS(ii)(valueY.value, valueX.value)
     },
     onEnd: (event, context) => {},
   })
@@ -64,12 +70,15 @@ const Record: React.FC<RecordScreenProps> = ({ navigation }) => {
   const _renderItem = (item: Emotions, idx: number) => {
     const rowIndex = parseInt(idx / NUM_COLS)
     const nowCenterRight = -valueX.value + BOX_WIDTH * (NUM_COLS / 2)
+    const nowCenterTop = -valueY.value + BOX_HEIGHT * 2
     const rightFromTL = idx - rowIndex * NUM_COLS
-    const topFromTL = rowIndex * BOX_HEIGHT + parseInt(BOX_HEIGHT / 2, 10)
+    const topFromTL = rowIndex * BOX_HEIGHT + BOX_HEIGHT / 2
 
     const isCenter =
       nowCenterRight - BOX_WIDTH / 2 < (rightFromTL + 0.5) * BOX_WIDTH &&
-      (rightFromTL + 0.5) * BOX_WIDTH < nowCenterRight + BOX_WIDTH / 2
+      (rightFromTL + 0.5) * BOX_WIDTH < nowCenterRight + BOX_WIDTH / 2 &&
+      nowCenterTop - BOX_HEIGHT / 2 < topFromTL &&
+      topFromTL < nowCenterTop + BOX_HEIGHT / 2
 
     return (
       <Box
@@ -80,7 +89,7 @@ const Record: React.FC<RecordScreenProps> = ({ navigation }) => {
       >
         <BoxText>
           {item.emotion}
-          {(idx - parseInt(idx / NUM_COLS) * NUM_COLS + 0.5) * BOX_WIDTH}
+          {parseInt(idx / NUM_COLS) * BOX_HEIGHT + BOX_HEIGHT / 2}
         </BoxText>
       </Box>
     )
@@ -175,13 +184,12 @@ const Box = styled.Pressable<{
   flex: 1;
   min-width: ${BOX_WIDTH}px;
   height: ${BOX_HEIGHT}px;
+  margin: ${BOX_MARGIN}px;
   font-size: 19px;
   font-weight: 800;
-  background-color: ${({ bg, isCenter }) =>
-    isCenter ? 'rgba(240,240,240,1)' : bg};
+  background-color: ${({ bg }) => bg};
   color: #eeeeee;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
-  margin: 6px;
   border: 1.5px solid
     ${({ selected }) =>
       selected ? 'rgb(120, 120, 120)' : 'rgba(255,255,255,0.8)'};
